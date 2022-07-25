@@ -6,4 +6,5 @@ app_name = 'accounts'
 
 urlpatterns = [
     path('otp/', views.OTPCodeView.as_view(), name='otp'),
+    path('user/profile/', views.UserProfile.as_view(), name='profile'),
 ]

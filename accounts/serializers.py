@@ -4,12 +4,7 @@ import random
 from django.utils import timezone
 from datetime import timedelta
 from .inc import create_code, verify_code
-
-
-def validate_phone_number(value):
-    if len(value) != 11 or not value.startswith('09'):
-        raise serializers.ValidationError('شماره تلفن وارد شده معتبر نمیباشد')
-    return value
+from .validators import validate_phone_number, validate_first_name, validate_last_name
 
 
 class PhoneNumberSerializer(serializers.Serializer):
@@ -38,3 +33,14 @@ class OTPCodeSerializer(serializers.ModelSerializer):
 
     def verify_otp(self, validated_data):
         return verify_code(validated_data['phone_number'], validated_data['code'])
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email', 'phone_number', 'image')
+        extra_kwargs = {
+            'phone_number': {'read_only': True},
+            'first_name': {'validators': [validate_first_name]},
+            'last_name': {'validators': [validate_last_name]},
+        }

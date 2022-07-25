@@ -9,8 +9,11 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=50, null=True, blank=True, verbose_name='نام خانوادگی')
     email = models.EmailField(max_length=100, unique=True, null=True, blank=True, verbose_name='ایمیل')
     phone_number = models.CharField(max_length=11, unique=True, verbose_name='شماره تلفن')
+    image = models.ImageField(upload_to='user/images/', null=True, blank=True, verbose_name='تصویر پروفایل')
     is_active = models.BooleanField(default=True, verbose_name='وضعیت فعال بودن')
     is_admin = models.BooleanField(default=False, verbose_name='وضعیت ادمین بودن')
+    created = models.DateTimeField(auto_now_add=True, verbose_name='تاریخ ایجاد')
+    updated = models.DateTimeField(auto_now=True, verbose_name='تاریخ به‌روزرسانی')
 
     class Meta:
         verbose_name = 'کاربر'
@@ -27,10 +30,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_staff(self):
         return self.is_admin
-
-    @property
-    def full_name(self):
-        return f'{self.first_name} {self.last_name}'
 
 
 class OTPCode(models.Model):
