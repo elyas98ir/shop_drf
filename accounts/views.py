@@ -1,5 +1,5 @@
 from rest_framework.views import APIView
-from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -8,6 +8,7 @@ from .permissions import IsOwner
 from rest_framework import status
 from . import serializers
 from .models import User, Address
+from orders.models import Order, Payment
 
 
 class OTPCodeView(APIView):
@@ -44,3 +45,19 @@ class AddressViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+
+class UserOrdersView(ListAPIView):
+    serializer_class = serializers.UserOrdersSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user, paid=True)
+
+
+class UserPaymentsView(ListAPIView):
+    serializer_class = serializers.UserPaymentsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Payment.objects.filter(user=self.request.user)

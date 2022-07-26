@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .inc import create_code, verify_code
 from .validators import validate_phone_number, validate_first_name, validate_last_name, validate_zipcode
+from orders.models import Order, Payment
 
 
 class PhoneNumberSerializer(serializers.Serializer):
@@ -53,3 +54,38 @@ class AddressSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'zipcode': {'validators': [validate_zipcode]}
         }
+
+
+class UserOrdersSerializer(serializers.ModelSerializer):
+
+    def get_total_amount(self, obj):
+        return obj.get_total_cost(without_discount=True)
+
+    def get_total_payment(self, obj):
+        return obj.get_total_cost(without_discount=False)
+
+    def get_order_items(self, obj):
+        order_items = []
+        for item in obj.items.all():
+            order_items.append({
+                'product_name': item.product.name,
+                'product_price': item.price,
+                'product_image': self.context['request'].build_absolute_uri(item.product.image.url),
+                'quantity': item.quantity,
+            })
+        return order_items
+
+    total_amount = serializers.SerializerMethodField()
+    total_payment = serializers.SerializerMethodField()
+    order_items = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ('id', 'recipient_name', 'recipient_phone_number', 'recipient_address', 'coupon_code',
+                  'coupon_discount', 'paid', 'updated', 'total_amount', 'total_payment', 'order_items')
+
+
+class UserPaymentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Payment
+        fields = ('id', 'order', 'amount', 'status', 'tracking_code', 'updated')
