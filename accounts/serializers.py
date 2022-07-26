@@ -1,10 +1,10 @@
 from rest_framework import serializers
-from .models import OTPCode, User
+from .models import OTPCode, User, Address
 import random
 from django.utils import timezone
 from datetime import timedelta
 from .inc import create_code, verify_code
-from .validators import validate_phone_number, validate_first_name, validate_last_name
+from .validators import validate_phone_number, validate_first_name, validate_last_name, validate_zipcode
 
 
 class PhoneNumberSerializer(serializers.Serializer):
@@ -43,4 +43,13 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'phone_number': {'read_only': True},
             'first_name': {'validators': [validate_first_name]},
             'last_name': {'validators': [validate_last_name]},
+        }
+
+
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ('id', 'state', 'city', 'address', 'zipcode')
+        extra_kwargs = {
+            'zipcode': {'validators': [validate_zipcode]}
         }

@@ -15,3 +15,8 @@ def validate_first_name(value):
 def validate_last_name(value):
     if len(value) < 3:
         raise serializers.ValidationError('نام خانوادگی باید حداقل 3 کاراکتر باشد')
+
+
+def validate_zipcode(value):
+    if len(value) != 10:
+        raise serializers.ValidationError('کدپستی باید 10 رقمی باشد')

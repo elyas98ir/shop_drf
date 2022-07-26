@@ -1,11 +1,13 @@
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
+from .permissions import IsOwner
 from rest_framework import status
 from . import serializers
-from .models import User
+from .models import User, Address
 
 
 class OTPCodeView(APIView):
@@ -31,3 +33,14 @@ class UserProfile(RetrieveUpdateAPIView):
 
     serializer_class = serializers.UserProfileSerializer
     permission_classes = [IsAuthenticated]
+
+
+class AddressViewSet(ModelViewSet):
+    serializer_class = serializers.AddressSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Address.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

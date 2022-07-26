@@ -32,6 +32,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.is_admin
 
 
+class Address(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='address', verbose_name='کاربر')
+    state = models.CharField(max_length=100, verbose_name='استان')
+    city = models.CharField(max_length=100, verbose_name='شهر')
+    address = models.CharField(max_length=200, verbose_name='آدرس')
+    zipcode = models.CharField(max_length=10, verbose_name='کدپستی')
+
+    def __str__(self):
+        return f'{self.user} - {self.state} - {self.city}'
+
+    class Meta:
+        verbose_name = 'آدرس'
+        verbose_name_plural = 'آدرس‌ها'
+
+
 class OTPCode(models.Model):
     phone_number = models.CharField(max_length=11, verbose_name='شماره تلفن')
     code = models.CharField(max_length=5, verbose_name='کد تایید')
